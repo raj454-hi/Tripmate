@@ -1,0 +1,131 @@
+/* =========================
+   GLOBAL CSS
+========================= */
+
+:root {
+  font-family: Arial, sans-serif;
+
+  color: #344054;
+  background: #ffffff;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+
+/* =========================
+   BODY
+========================= */
+
+body {
+  margin: 0;
+  padding: 0;
+
+  min-width: 320px;
+  min-height: 100vh;
+
+  background: #ffffff;
+}
+
+
+/* =========================
+   ROOT
+========================= */
+
+#root {
+  width: 100%;
+  min-height: 100vh;
+
+  margin: 0 auto;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   BOX SIZING
+========================= */
+
+* {
+  box-sizing: border-box;
+}
+
+
+/* =========================
+   REMOVE DEFAULT MARGINS
+========================= */
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p {
+  margin: 0;
+}
+
+
+/* =========================
+   IMAGES
+========================= */
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+button {
+  font-family: Arial, sans-serif;
+  cursor: pointer;
+}
+
+
+/* =========================
+   FORM ELEMENTS
+========================= */
+
+input,
+select,
+textarea {
+  font-family: Arial, sans-serif;
+}
+
+
+/* =========================
+   LINKS
+========================= */
+
+a {
+  text-decoration: none;
+}
+
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c9d7f2;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #155eef;
+}

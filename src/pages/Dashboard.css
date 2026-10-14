@@ -1,0 +1,154 @@
+.dashboard {
+  min-height: 100vh;
+  padding: 100px 50px 50px;
+  background-color: #f5f8f6;
+}
+
+.dashboard h1 {
+  text-align: center;
+  color: #18352d;
+  margin-bottom: 10px;
+}
+
+.dashboard-subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+/* Total Trips */
+
+.total-trips {
+  width: 200px;
+  padding: 20px;
+  margin-bottom: 30px;
+
+  background-color: white;
+  border-radius: 10px;
+
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+
+  text-align: center;
+}
+
+.total-trips h3 {
+  color: #555;
+}
+
+.total-trips h2 {
+  color: #219b63;
+  font-size: 32px;
+}
+
+/* Trip List */
+
+.trip-list {
+  display: grid;
+
+  grid-template-columns:
+    repeat(auto-fit, minmax(300px, 1fr));
+
+  gap: 25px;
+}
+
+/* Trip Card */
+
+.trip-card {
+  background-color: white;
+
+  padding: 25px;
+
+  border-radius: 12px;
+
+  box-shadow:
+    0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.trip-card h2 {
+  color: #219b63;
+  margin-bottom: 20px;
+}
+
+.trip-info {
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 15px;
+}
+
+.trip-info p {
+  color: #555;
+  line-height: 1.5;
+}
+
+.description {
+  margin-top: 20px;
+  color: #555;
+  line-height: 1.5;
+}
+
+/* Button */
+
+.view-btn {
+  width: 100%;
+
+  margin-top: 20px;
+
+  padding: 12px;
+
+  border: none;
+  border-radius: 6px;
+
+  background-color: #219b63;
+  color: white;
+
+  font-size: 15px;
+
+  cursor: pointer;
+}
+
+.view-btn:hover {
+  background-color: #167a4b;
+}
+
+/* No Trips */
+
+.no-trips {
+  text-align: center;
+
+  background-color: white;
+
+  padding: 50px;
+
+  border-radius: 10px;
+}
+
+.no-trips h2 {
+  color: #18352d;
+}
+
+.no-trips p {
+  color: #666;
+}
+
+/* Delete Button */
+
+.delete-btn {
+  width: 100%;
+  margin-top: 10px;
+  padding: 12px;
+
+  border: none;
+  border-radius: 6px;
+
+  background-color: #dc2626;
+  color: white;
+
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background-color: #b91c1c;
+}

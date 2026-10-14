@@ -1,0 +1,175 @@
+
+/* Global box sizing */
+.home,
+.home * {
+  box-sizing: border-box;
+}
+
+/* Home Page */
+.home {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 100px 24px 40px;
+
+  background-image:
+    linear-gradient(
+      rgba(10, 20, 30, 0.45),
+      rgba(10, 20, 30, 0.45)
+    ),
+    url("/Saffron%20Flag%20Over%20Misty%20Mountain%20Fort.png");
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Content */
+.home-content {
+  width: 100%;
+  max-width: 850px;
+  text-align: center;
+  color: #ffffff;
+  padding: 30px 20px;
+  animation: homeAppear 0.8s ease;
+}
+
+/* Heading */
+.home-content h1 {
+  font-size: clamp(32px, 5vw, 64px);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -1.8px;
+  overflow-wrap: break-word;
+  margin: 0 0 22px;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+/* Description */
+.home-content p {
+  max-width: 620px;
+  margin: 0 auto 32px;
+  font-size: clamp(15px, 2vw, 18px);
+  line-height: 1.8;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+/* Create Trip Button */
+.home-content button {
+  display: inline-block;
+  max-width: 100%;
+  padding: 15px 30px;
+  background: #10b981;
+  color: #ffffff;
+  border: 1px solid #10b981;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 8px 24px rgba(16, 185, 129, 0.25);
+  transition: background 0.25s ease,
+              transform 0.25s ease,
+              box-shadow 0.25s ease;
+}
+
+.home-content button:hover {
+  background: #059669;
+  border-color: #059669;
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(16, 185, 129, 0.35);
+}
+
+.home-content button:active {
+  transform: translateY(0);
+}
+
+/* Entrance Animation */
+@keyframes homeAppear {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Tablet */
+@media (max-width: 900px) {
+  .home {
+    background-position: center;
+    padding: 110px 24px 40px;
+  }
+
+  .home-content {
+    padding: 25px 15px;
+  }
+
+  .home-content h1 {
+    letter-spacing: -1px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 600px) {
+  .home {
+    min-height: 100svh;
+    padding: 125px 18px 35px;
+    background-position: center;
+  }
+
+  .home-content {
+    padding: 20px 5px;
+  }
+
+  .home-content h1 {
+    font-size: clamp(30px, 8vw, 42px);
+    line-height: 1.2;
+    letter-spacing: -0.8px;
+    margin-bottom: 18px;
+  }
+
+  .home-content p {
+    font-size: 15px;
+    line-height: 1.7;
+    margin-bottom: 25px;
+  }
+
+  .home-content button {
+    padding: 13px 24px;
+    font-size: 15px;
+  }
+}
+
+/* Small Mobile */
+@media (max-width: 380px) {
+  .home {
+    padding-left: 12px;
+    padding-right: 12px;
+  }
+
+  .home-content h1 {
+    font-size: 29px;
+    letter-spacing: -0.5px;
+  }
+
+  .home-content p {
+    font-size: 14px;
+  }
+}
+
+/* Reduce animation for accessibility */
+@media (prefers-reduced-motion: reduce) {
+  .home-content {
+    animation: none;
+  }
+
+  .home-content button {
+    transition: none;
+  }
+}
