@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import CreateTrip from "./pages/CreateTrip";
 import Expenses from "./pages/Expences";
+import SplitMoney from "./pages/SplitMoney";
 
 function App() {
   return (
@@ -27,6 +28,8 @@ function App() {
 
 
         <Route path="/expenses" element={<Expenses />} />
+
+        <Route path="/split-money" element={<SplitMoney />} />
 
       </Routes>
     </>
