@@ -16,7 +16,6 @@ function CreateTrip() {
 
   const [message, setMessage] = useState("");
 
-  // Handle input changes
   const handleChange = (e) => {
     setTrip({
       ...trip,
@@ -42,7 +41,7 @@ function CreateTrip() {
       return;
     }
 
-    // Save trip in localStorage
+
     const existingTrips =
       JSON.parse(localStorage.getItem("trips")) || [];
 

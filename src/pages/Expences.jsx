@@ -9,53 +9,53 @@ function Expenses() {
   const [category, setCategory] = useState("Food");
   const [members, setMembers] = useState("4");
 
+  // Load saved expenses
   const [expenses, setExpenses] = useState(() => {
-    const savedExpenses = localStorage.getItem("tripmateExpenses");
-    return savedExpenses ? JSON.parse(savedExpenses) : [];
+    const saved = localStorage.getItem("tripmateExpenses");
+    return saved ? JSON.parse(saved) : [];
   });
 
-  // Save expenses in browser
+
   useEffect(() => {
     localStorage.setItem("tripmateExpenses", JSON.stringify(expenses));
   }, [expenses]);
 
-  // Calculate total expense
-  let totalExpense = 0;
+  // Calculate total expenses
+  const totalExpense = expenses.reduce(
+    (total, expense) => total + Number(expense.amount),
+    0
+  );
 
-  expenses.forEach((expense) => {
-    totalExpense = totalExpense + Number(expense.amount);
-  });
+  // Calculate share per person
+  const perPerson =
+    Number(members) > 0 ? totalExpense / Number(members) : 0;
 
-  // Calculate equal share per member
-  const perPerson = Number(members) > 0
-    ? totalExpense / Number(members)
-    : 0;
-
-  // Add expense
+  // Add new expense
   function handleSubmit(e) {
     e.preventDefault();
 
-    if (!expenseName.trim() || !amount || !paidBy.trim()) {
-      alert("Please fill all required fields.");
+    if (!expenseName.trim() || !paidBy.trim() || Number(amount) <= 0) {
+      alert("Please enter valid expense details.");
       return;
     }
 
-    if (Number(amount) <= 0 || Number(members) <= 0) {
-      alert("Amount and members must be greater than zero.");
+    if (Number(members) <= 0) {
+      alert("Number of members must be greater than zero.");
       return;
     }
 
     const newExpense = {
       id: Date.now(),
-      name: expenseName,
+      name: expenseName.trim(),
       amount: Number(amount),
-      paidBy: paidBy,
+      paidBy: paidBy.trim(),
       category: category,
-      date: new Date().toLocaleDateString("en-IN")
+      date: new Date().toLocaleDateString("en-IN"),
     };
 
     setExpenses([...expenses, newExpense]);
 
+    // Clear form
     setExpenseName("");
     setAmount("");
     setPaidBy("");
@@ -64,28 +64,28 @@ function Expenses() {
 
   // Delete expense
   function deleteExpense(id) {
-    const updatedExpenses = expenses.filter(
-      (expense) => expense.id !== id
+    setExpenses(
+      expenses.filter((expense) => expense.id !== id)
     );
-
-    setExpenses(updatedExpenses);
   }
 
   return (
     <div className="expenses-page">
 
+      {/* Page Header */}
       <div className="expenses-header">
         <h1>Expense Tracker</h1>
         <p>Track your trip expenses and split the cost with friends.</p>
       </div>
 
-      {/* Expense Summary */}
-
+      {/* Summary */}
       <div className="expense-summary">
 
         <div className="summary-card">
           <p>Total Expenses</p>
-          <h2>₹{totalExpense.toLocaleString("en-IN")}</h2>
+          <h2>
+            ₹{totalExpense.toLocaleString("en-IN")}
+          </h2>
         </div>
 
         <div className="summary-card">
@@ -95,15 +95,16 @@ function Expenses() {
 
         <div className="summary-card">
           <p>Share Per Person</p>
-          <h2>₹{perPerson.toLocaleString("en-IN", {
-            maximumFractionDigits: 2
-          })}</h2>
+          <h2>
+            ₹{perPerson.toLocaleString("en-IN", {
+              maximumFractionDigits: 2,
+            })}
+          </h2>
         </div>
 
       </div>
 
       {/* Add Expense Form */}
-
       <div className="expense-form-card">
         <h2>Add New Expense</h2>
 
@@ -122,7 +123,7 @@ function Expenses() {
           <input
             type="number"
             placeholder="Enter amount"
-            min="1"
+            min="0.01"
             step="0.01"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
@@ -168,7 +169,6 @@ function Expenses() {
       </div>
 
       {/* Expense List */}
-
       <div className="expense-list-card">
         <h2>Recent Expenses</h2>
 
@@ -177,7 +177,6 @@ function Expenses() {
             No expenses yet. Add your first trip expense!
           </p>
         ) : (
-
           <div className="expense-table-wrapper">
             <table className="expense-table">
 
@@ -198,10 +197,13 @@ function Expenses() {
                     <td>{expense.name}</td>
                     <td>{expense.category}</td>
                     <td>{expense.paidBy}</td>
-                    <td>₹{Number(expense.amount).toLocaleString("en-IN")}</td>
+                    <td>
+                      ₹{Number(expense.amount).toLocaleString("en-IN")}
+                    </td>
                     <td>{expense.date}</td>
                     <td>
                       <button
+                        type="button"
                         className="delete-expense-btn"
                         onClick={() => deleteExpense(expense.id)}
                       >
@@ -215,7 +217,6 @@ function Expenses() {
             </table>
           </div>
         )}
-
       </div>
 
     </div>

@@ -1,180 +1,88 @@
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import "./SplitMoney.css";
 
-const initialMembers = [
-  { id: 1, name: "Amol", paid: 5000 },
-  { id: 2, name: "Rahul", paid: 3000 },
-  { id: 3, name: "Akash", paid: 2000 },
-  { id: 4, name: "Sagar", paid: 2000 },
-];
-
 function SplitMoney() {
-  const [members, setMembers] = useState(() => {
-    try {
-      const saved = localStorage.getItem("tripmateSplitMembers");
-      return saved ? JSON.parse(saved) : initialMembers;
-    } catch {
-      return initialMembers;
-    }
-  });
-
+  const [members, setMembers] = useState([]);
   const [settlements, setSettlements] = useState([]);
   const [calculated, setCalculated] = useState(false);
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    localStorage.setItem(
-      "tripmateSplitMembers",
-      JSON.stringify(members)
-    );
-  }, [members]);
-
-  const totalExpense = members.reduce(
-    (total, member) => total + Number(member.paid || 0),
-    0
+  const total = members.reduce(
+    (sum, member) => sum + Number(member.paid || 0), 0
   );
 
-  const perPersonShare =
-    members.length > 0 ? totalExpense / members.length : 0;
+  const share = members.length ? total / members.length : 0;
 
-  const updateMember = (id, field, value) => {
-    setMembers((currentMembers) =>
-      currentMembers.map((member) =>
-        member.id === id
-          ? {
-              ...member,
-              [field]: field === "paid" ? value : value,
-            }
-          : member
-      )
-    );
-
+  function addMember() {
+    setMembers([...members, { id: Date.now(), name: "", paid: "" }]);
     setCalculated(false);
     setSettlements([]);
-    setError("");
-  };
+  }
 
-  const addMember = () => {
-    setMembers((currentMembers) => [
-      ...currentMembers,
-      {
-        id: Date.now(),
-        name: "",
-        paid: 0,
-      },
-    ]);
-
+  function updateMember(id, field, value) {
+    setMembers(members.map((m) =>
+      m.id === id ? { ...m, [field]: value } : m
+    ));
     setCalculated(false);
     setSettlements([]);
-  };
+  }
 
-  const removeMember = (id) => {
-    setMembers((currentMembers) =>
-      currentMembers.filter((member) => member.id !== id)
-    );
-
+  function removeMember(id) {
+    setMembers(members.filter((m) => m.id !== id));
     setCalculated(false);
     setSettlements([]);
-    setError("");
-  };
+  }
 
-  const calculateSplit = () => {
-    if (members.length < 2) {
-      setError("Add at least 2 members to split the money.");
+  function calculateSplit() {
+    if (members.length < 2 || members.some((m) => !m.name.trim())) {
+      setError("Add at least 2 members and enter their names.");
       return;
     }
 
-    if (members.some((member) => !member.name.trim())) {
-      setError("Please enter a name for every member.");
+    if (members.some((m) => m.paid === "" || !Number.isFinite(Number(m.paid)) || Number(m.paid) < 0)) {
+      setError("Enter valid amounts for all members.");
       return;
     }
 
-    if (
-      members.some(
-        (member) =>
-          member.paid === "" ||
-          !Number.isFinite(Number(member.paid)) ||
-          Number(member.paid) < 0
-      )
-    ) {
-      setError("Enter a valid amount for every member.");
-      return;
-    }
-
-    // Positive balance = member should receive money.
-    // Negative balance = member should pay money.
-    const balances = members.map((member) => ({
-      name: member.name.trim(),
-      balance: Number(member.paid) - perPersonShare,
+    const people = members.map((m) => ({
+      name: m.name.trim(),
+      balance: Number(m.paid) - share,
     }));
 
-    const creditors = balances
-      .filter((member) => member.balance > 0.005)
-      .map((member) => ({ ...member }));
+    const debtors = people.filter((m) => m.balance < -0.005);
+    const creditors = people.filter((m) => m.balance > 0.005);
+    const result = [];
+    let i = 0, j = 0;
 
-    const debtors = balances
-      .filter((member) => member.balance < -0.005)
-      .map((member) => ({ ...member }));
+    while (i < debtors.length && j < creditors.length) {
+      const amount = Math.min(-debtors[i].balance, creditors[j].balance);
 
-    const newSettlements = [];
-    let debtorIndex = 0;
-    let creditorIndex = 0;
-
-    while (
-      debtorIndex < debtors.length &&
-      creditorIndex < creditors.length
-    ) {
-      const amount = Math.min(
-        -debtors[debtorIndex].balance,
-        creditors[creditorIndex].balance
-      );
-
-      newSettlements.push({
-        id: newSettlements.length + 1,
-        from: debtors[debtorIndex].name,
-        to: creditors[creditorIndex].name,
+      result.push({
+        id: result.length + 1,
+        from: debtors[i].name,
+        to: creditors[j].name,
         amount: Math.round(amount * 100) / 100,
         paid: false,
       });
 
-      debtors[debtorIndex].balance += amount;
-      creditors[creditorIndex].balance -= amount;
+      debtors[i].balance += amount;
+      creditors[j].balance -= amount;
 
-      if (Math.abs(debtors[debtorIndex].balance) < 0.005) {
-        debtorIndex++;
-      }
-
-      if (Math.abs(creditors[creditorIndex].balance) < 0.005) {
-        creditorIndex++;
-      }
+      if (Math.abs(debtors[i].balance) < 0.005) i++;
+      if (Math.abs(creditors[j].balance) < 0.005) j++;
     }
 
-    setSettlements(newSettlements);
+    setSettlements(result);
     setCalculated(true);
     setError("");
-  };
+  }
 
-  const markAsPaid = (id) => {
-    setSettlements((current) =>
-      current.map((item) =>
-        item.id === id ? { ...item, paid: !item.paid } : item
-      )
-    );
-  };
-
-  const resetSplit = () => {
-    setMembers([]);
-    setSettlements([]);
-    setCalculated(false);
-    setError("");
-  };
-
-  const formatMoney = (amount) =>
-    `₹${Number(amount).toLocaleString("en-IN", {
-      minimumFractionDigits: 2,
+  function money(amount) {
+    return "₹" + Number(amount).toLocaleString("en-IN", {
       maximumFractionDigits: 2,
-    })}`;
+    });
+  }
 
   return (
     <div className="split-page">
@@ -182,26 +90,18 @@ function SplitMoney() {
         <header className="split-header">
           <p className="split-eyebrow">TRIPMATE • GROUP EXPENSES</p>
           <h1>Split Money</h1>
-          <p>
-            Add your travel buddies, enter how much each person paid,
-            and calculate who owes whom.
-          </p>
+          <p>Add members and calculate who pays whom.</p>
         </header>
 
         <section className="split-summary">
           <div className="summary-card">
-            <span>Total Expense</span>
-            <h2>{formatMoney(totalExpense)}</h2>
+            <span>Total Expense</span><h2>{money(total)}</h2>
           </div>
-
           <div className="summary-card">
-            <span>Total Members</span>
-            <h2>{members.length}</h2>
+            <span>Total Members</span><h2>{members.length}</h2>
           </div>
-
           <div className="summary-card">
-            <span>Share Per Person</span>
-            <h2>{formatMoney(perPersonShare)}</h2>
+            <span>Share Per Person</span><h2>{money(share)}</h2>
           </div>
         </section>
 
@@ -209,32 +109,24 @@ function SplitMoney() {
           <div className="split-panel-heading">
             <div>
               <h2>Trip Members</h2>
-              <p>Enter each member's name and total amount paid.</p>
+              <p>Enter each member's name and amount paid.</p>
             </div>
-
-            <button
-              type="button"
-              className="split-secondary-btn"
-              onClick={addMember}
-            >
+            <button className="split-secondary-btn" onClick={addMember}>
               + Add Member
             </button>
           </div>
 
           <div className="member-list">
-            {members.map((member, index) => (
-              <div className="member-row" key={member.id}>
+            {members.map((m, index) => (
+              <div className="member-row" key={m.id}>
                 <span className="member-number">{index + 1}</span>
 
                 <label className="split-field">
                   <span>Member Name</span>
                   <input
-                    type="text"
                     placeholder="Enter name"
-                    value={member.name}
-                    onChange={(event) =>
-                      updateMember(member.id, "name", event.target.value)
-                    }
+                    value={m.name}
+                    onChange={(e) => updateMember(m.id, "name", e.target.value)}
                   />
                 </label>
 
@@ -243,50 +135,35 @@ function SplitMoney() {
                   <input
                     type="number"
                     min="0"
-                    step="0.01"
-                    placeholder="0"
-                    value={member.paid}
-                    onChange={(event) =>
-                      updateMember(member.id, "paid", event.target.value)
-                    }
+                    placeholder="Enter amount"
+                    value={m.paid}
+                    onChange={(e) => updateMember(m.id, "paid", e.target.value)}
                   />
                 </label>
 
-                <button
-                  type="button"
-                  className="remove-member-btn"
-                  onClick={() => removeMember(member.id)}
-                  aria-label={`Remove ${member.name || "member"}`}
-                  title="Remove member"
-                >
+                <button className="remove-member-btn" onClick={() => removeMember(m.id)}>
                   ✕
                 </button>
               </div>
             ))}
 
-            {members.length === 0 && (
-              <p className="split-empty">
-                No members added yet. Click “Add Member” to start.
-              </p>
+            {!members.length && (
+              <p className="split-empty">No members yet. Click Add Member.</p>
             )}
           </div>
 
           {error && <p className="split-error">{error}</p>}
 
           <div className="split-actions">
-            <button
-              type="button"
-              className="split-primary-btn"
-              onClick={calculateSplit}
-            >
+            <button className="split-primary-btn" onClick={calculateSplit}>
               Calculate Split
             </button>
-
-            <button
-              type="button"
-              className="split-reset-btn"
-              onClick={resetSplit}
-            >
+            <button className="split-reset-btn" onClick={() => {
+              setMembers([]);
+              setSettlements([]);
+              setCalculated(false);
+              setError("");
+            }}>
               Clear All
             </button>
           </div>
@@ -294,53 +171,27 @@ function SplitMoney() {
 
         {calculated && (
           <section className="split-panel settlement-panel">
-            <div className="split-panel-heading">
-              <div>
-                <h2>Settlement Summary</h2>
-                <p>Who should pay whom to make the split equal.</p>
+            <h2>Settlement Summary</h2>
+            <p className="share-info">Each person's share: <strong>{money(share)}</strong></p>
+
+            {!settlements.length ? (
+              <p className="split-success">Everyone is settled!</p>
+            ) : settlements.map((s) => (
+              <div className="settlement-row" key={s.id}>
+                <div className="settlement-details">
+                  <strong>{s.from}</strong> pays <strong>{s.to}</strong>
+                  <h3>{money(s.amount)}</h3>
+                </div>
+                <button
+                  className={s.paid ? "paid-btn is-paid" : "paid-btn"}
+                  onClick={() => setSettlements(settlements.map((item) =>
+                    item.id === s.id ? { ...item, paid: !item.paid } : item
+                  ))}
+                >
+                  {s.paid ? "✓ Paid" : "Mark as Paid"}
+                </button>
               </div>
-            </div>
-
-            <div className="share-info">
-              Each member's share is{" "}
-              <strong>{formatMoney(perPersonShare)}</strong>.
-            </div>
-
-            {settlements.length === 0 ? (
-              <p className="split-success">
-                Everyone is settled! No payments are needed.
-              </p>
-            ) : (
-              <div className="settlement-list">
-                {settlements.map((item) => (
-                  <div className="settlement-row" key={item.id}>
-                    <div className="settlement-details">
-                      <strong>{item.from}</strong>
-                      <span> pays </span>
-                      <strong>{item.to}</strong>
-                      <h3>{formatMoney(item.amount)}</h3>
-                    </div>
-
-                    <button
-                      type="button"
-                      className={
-                        item.paid
-                          ? "paid-btn is-paid"
-                          : "paid-btn"
-                      }
-                      onClick={() => markAsPaid(item.id)}
-                    >
-                      {item.paid ? "✓ Paid" : "Mark as Paid"}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <p className="split-note">
-              Note: Marking a payment as paid is currently temporary.
-              Payment status will reset if you recalculate or refresh.
-            </p>
+            ))}
           </section>
         )}
       </div>
